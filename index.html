@@ -6,29 +6,99 @@
     <title>MediFlow | Patient Portal</title>
     <style>
         :root { --primary: #2c7a7b; --dark: #2d3748; --accent: #38b2ac; --danger: #e53e3e; }
-        body { font-family: 'Segoe UI', sans-serif; background: #edf2f7; margin: 0; display: flex; height: 100vh; overflow: hidden;}
         
-        /* Auth Flow Styling */
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .auth-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .auth-box h2 { color: var(--primary); margin-bottom: 20px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #edf2f7; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* Responsive Layout Container */
+        .app-container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
         
-        /* Sidebar & Navigation */
-        .sidebar { width: 260px; background: var(--dark); color: white; padding: 25px; box-sizing: border-box; }
+        /* Auth Flow Styling - Responsive */
+        .overlay { 
+            position: fixed; 
+            top:0; left:0; 
+            width:100%; height:100%; 
+            background: var(--dark); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 2000; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .auth-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            text-align: center; 
+            width: 100%;
+            max-width: 400px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+        }
+        .auth-box h2 { color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; }
+        
+        /* Sidebar & Navigation - Responsive Drawer */
+        .sidebar { 
+            width: 260px; 
+            background: var(--dark); 
+            color: white; 
+            padding: 25px; 
+            box-sizing: border-box; 
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
         .sidebar h2 { color: var(--accent); margin-top: 0; cursor: pointer; }
         .nav-item { padding: 12px 0; border-bottom: 1px solid #4a5568; cursor: pointer; color: #cbd5e0; font-weight: 500; }
         .nav-item:hover, .nav-item.active { color: white; border-left: 4px solid var(--accent); padding-left: 10px; }
 
-        /* Main Content */
-        .main { flex: 1; padding: 30px; overflow-y: auto; }
+        /* Mobile Menu Header (Visible only on mobile) */
+        .mobile-header {
+            display: none;
+            background: var(--dark);
+            color: white;
+            padding: 15px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1002;
+        }
+
+        /* Main Content - Scrollable */
+        .main { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
         label { display: block; margin-top: 15px; font-weight: 600; color: #4a5568; }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 16px; /* Prevents iOS auto-zoom */}
+        button { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; transition: 0.3s; font-size: 1rem; }
         button:hover { background: #285e61; }
 
         /* New Styles for Reminders and SOS */
@@ -41,8 +111,31 @@
             margin-top: 10px; 
             border-radius: 4px; 
             display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .mobile-header { display: flex; }
+            .sidebar {
+                position: absolute;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main { padding: 15px; }
+            body { height: auto; min-height: 100vh; }
+            .app-container { height: auto; flex-direction: column; }
+            
+            header h1 { font-size: 1.5rem; }
+            #userNameDisplay { font-size: 0.8rem; }
+        }
+
+        @media (min-width: 769px) {
+            .reminder-item { flex-direction: row; justify-content: space-between; align-items: center; }
         }
     </style>
 </head>
@@ -53,7 +146,6 @@
             <h2>Welcome to MediFlow</h2>
             <p>Create your health account</p>
             <input type="text" id="regName" placeholder="Full Name">
-         
             <input type="text" id="regId" placeholder="Patient ID (ID-XXXX)">
             <button onclick="goToSignIn()">Create Account</button>
             <p style="font-size:0.8rem; margin-top:15px; cursor:pointer; color:var(--primary)" onclick="showSignIn()">Already have an account? Sign In</p>
@@ -70,144 +162,147 @@
         </div>
     </div>
 
-    <div class="sidebar">
-        <h2 onclick="showPage('dashboard')">MediFlow</h2>
-        <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</div>
-        <div class="nav-item" id="nav-appt" onclick="showPage('appt')">📅 My Appointments</div>
-        <div class="nav-item" id="nav-reminders" onclick="showPage('reminders')">⏰ Medication Tracker</div>
-        <div class="nav-item" id="nav-drug" onclick="showPage('drug')">🛡️ Drug Verification</div>
-        <div class="nav-item" id="nav-hosp" onclick="showPage('hosp')">🏥 Hospital Directory</div>
-        <div class="nav-item" id="nav-emergency" style="color: #feb2b2;" onclick="showPage('emergency')">🚨 Emergency SOS</div>
+    <div class="mobile-header">
+        <span style="font-weight:bold; font-size:1.2rem; color:var(--accent);">MediFlow</span>
+        <button onclick="toggleMenu()" style="width:auto; margin:0; padding: 5px 10px; background:transparent;">☰</button>
     </div>
 
-    <div class="main">
-        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <h1 id="pageTitle" style="text-transform: capitalize;">Dashboard</h1>
-            <span id="userNameDisplay" style="font-weight:bold; color:var(--primary)"></span>
-        </header>
-
-        <div id="page-dashboard" class="page active">
-            <div class="card" style="max-width: 600px;">
-                <h3>Book a Visit</h3>
-                
-                <label>Select Hospital</label>
-                <select id="hospSelect">
-                    <option>Unilorin Health Centre (Main Campus)</option>
-                    <option>University of Ilorin Teaching Hospital (UITH)</option>
-                    <option>General Hospital, Ilorin</option>
-                </select>
-
-                <label>Choose Date</label>
-                <input type="date" id="apptDate">
-
-                <label>Choose Time</label>
-                <select id="apptTime">
-                    <option value="9">09:00 AM</option>
-                    <option value="11">11:00 AM</option>
-                    <option value="13">01:00 PM</option>
-                    <option value="15">03:00 PM</option>
-                </select>
-
-                <label>Phone Number</label>
-                <input type="tel" id="userPhone" placeholder="+234XXXXXXXXXX">
-                
-                <button onclick="bookNow()">Confirm Appointment</button>
-            </div>
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+            <h2 onclick="showPage('dashboard')">MediFlow</h2>
+            <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" id="nav-appt" onclick="showPage('appt')">📅 My Appointments</div>
+            <div class="nav-item" id="nav-reminders" onclick="showPage('reminders')">⏰ Medication Tracker</div>
+            <div class="nav-item" id="nav-drug" onclick="showPage('drug')">🛡️ Drug Verification</div>
+            <div class="nav-item" id="nav-hosp" onclick="showPage('hosp')">🏥 Hospital Directory</div>
+            <div class="nav-item" id="nav-emergency" style="color: #feb2b2;" onclick="showPage('emergency')">🚨 Emergency SOS</div>
         </div>
 
-        <div id="page-appt" class="page">
-            <div class="card" id="noAppt">No active appointments found.</div>
-            <div id="apptList"></div>
-        </div>
+        <div class="main">
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h1 id="pageTitle" style="text-transform: capitalize; margin: 0;">Dashboard</h1>
+                <span id="userNameDisplay" style="font-weight:bold; color:var(--primary); text-align: right;"></span>
+            </header>
 
-        <div id="page-reminders" class="page">
-            <div class="card">
-                <h3>Add Medication Reminder</h3>
-                <label>Drug Name</label>
-                <input type="text" id="drugName" placeholder="e.g., Paracetamol">
-                <label>Time to take</label>
-                <input type="time" id="drugTime">
-                <label>Number of Days</label>
-                <input type="number" id="drugDays" placeholder="e.g., 5">
-                <button onclick="addReminder()">Add Reminder</button>
-            </div>
-            <div class="card">
-                <h3>My Medication List</h3>
-                <div id="reminderList">No reminders added yet.</div>
-            </div>
-        </div>
+            <div id="page-dashboard" class="page active">
+                <div class="card" style="max-width: 600px;">
+                    <h3>Book a Visit</h3>
+                    
+                    <label>Select Hospital</label>
+                    <select id="hospSelect">
+                        <option>Unilorin Health Centre (Main Campus)</option>
+                        <option>University of Ilorin Teaching Hospital (UITH)</option>
+                        <option>General Hospital, Ilorin</option>
+                    </select>
 
-        <div id="page-drug" class="page">
-            <div class="card">
-                <h3>Drug Authenticator</h3>
-                <label>Enter 12-digit scratch-off PIN</label>
-                <input type="text" id="drugPin" placeholder="Enter PIN">
-                <button onclick="verifyDrug()">Verify Medication</button>
-                <p id="drugResult" style="margin-top:15px; font-weight:bold;"></p>
-            </div>
-        </div>
+                    <label>Choose Date</label>
+                    <input type="date" id="apptDate">
 
-        <div id="page-emergency" class="page">
-            <div class="card" style="text-align: center; border: 2px solid var(--danger);">
-                <h2 style="color: var(--danger);">EMERGENCY SOS</h2>
-                <p>Are you in a life-threatening situation?</p>
-                <button class="sos-btn" onclick="triggerSOS()">🚨 PRESS FOR EMERGENCY CALL</button>
-                <div id="emergencyInfo" style="margin-top: 20px; display: none;">
-                    <div class="card" style="background: #fff5f5;">
-                        <h4>Direct Hospital Lines:</h4>
-                        <p><b>UITH ER:</b> +234 803 XXX XXXX</p>
-                        <p><b>Unilorin Clinic:</b> +234 805 XXX XXXX</p>
-                        <p><b>State Ambulance:</b> 112</p>
+                    <label>Choose Time</label>
+                    <select id="apptTime">
+                        <option value="9">09:00 AM</option>
+                        <option value="11">11:00 AM</option>
+                        <option value="13">01:00 PM</option>
+                        <option value="15">03:00 PM</option>
+                    </select>
+
+                    <label>Phone Number</label>
+                    <input type="tel" id="userPhone" placeholder="+234XXXXXXXXXX">
+                    
+                    <button onclick="bookNow()">Confirm Appointment</button>
+                </div>
+            </div>
+
+            <div id="page-appt" class="page">
+                <div class="card" id="noAppt">No active appointments found.</div>
+                <div id="apptList"></div>
+            </div>
+
+            <div id="page-reminders" class="page">
+                <div class="card">
+                    <h3>Add Medication Reminder</h3>
+                    <label>Drug Name</label>
+                    <input type="text" id="drugName" placeholder="e.g., Paracetamol">
+                    <label>Time to take</label>
+                    <input type="time" id="drugTime">
+                    <label>Number of Days</label>
+                    <input type="number" id="drugDays" placeholder="e.g., 5">
+                    <button onclick="addReminder()">Add Reminder</button>
+                </div>
+                <div class="card">
+                    <h3>My Medication List</h3>
+                    <div id="reminderList">No reminders added yet.</div>
+                </div>
+            </div>
+
+            <div id="page-drug" class="page">
+                <div class="card">
+                    <h3>Drug Authenticator</h3>
+                    <label>Enter 12-digit scratch-off PIN</label>
+                    <input type="text" id="drugPin" placeholder="Enter PIN">
+                    <button onclick="verifyDrug()">Verify Medication</button>
+                    <p id="drugResult" style="margin-top:15px; font-weight:bold;"></p>
+                </div>
+            </div>
+
+            <div id="page-emergency" class="page">
+                <div class="card" style="text-align: center; border: 2px solid var(--danger);">
+                    <h2 style="color: var(--danger);">EMERGENCY SOS</h2>
+                    <p>Are you in a life-threatening situation?</p>
+                    <button class="sos-btn" onclick="triggerSOS()">🚨 PRESS FOR EMERGENCY CALL</button>
+                    <div id="emergencyInfo" style="margin-top: 20px; display: none;">
+                        <div class="card" style="background: #fff5f5; border: 1px solid #feb2b2;">
+                            <h4>Direct Hospital Lines:</h4>
+                            <p><b>UITH ER:</b> +234 803 XXX XXXX</p>
+                            <p><b>Unilorin Clinic:</b> +234 805 XXX XXXX</p>
+                            <p><b>State Ambulance:</b> 112</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="page-hosp" class="page">
-            <div class="card">
-                <h3>Avaliable Healthcare Centers</h3>
-                <ul>
-                    <li><b>UITH:</b> Oke-Oyi, Ilorin</li>
-                    <li><b>Unilorin Clinic:</b> Student Union Area</li>
-                    <li><b>General Hospital:</b> Surulere, Ilorin</li>
-                </ul>
+            <div id="page-hosp" class="page">
+                <div class="card">
+                    <h3>Available Healthcare Centers</h3>
+                    <ul style="padding-left: 20px;">
+                        <li><b>UITH:</b> Oke-Oyi, Ilorin</li>
+                        <li><b>Unilorin Clinic:</b> Student Union Area</li>
+                        <li><b>General Hospital:</b> Surulere, Ilorin</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Responsive Menu Toggle
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
         // Navigation Logic
         function showPage(pageId) {
-            // 1. Hide all pages and deactivate all nav items
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-            // 2. Show the specific page the user clicked
             document.getElementById('page-' + pageId).classList.add('active');
             document.getElementById('nav-' + pageId).classList.add('active');
 
-            // 3. TRANSLATION LOGIC
-            let professionalTitle = "";
-            
-            if (pageId === 'appt') {
-                professionalTitle = "My Appointments";
-            } else if (pageId === 'drug') {
-                professionalTitle = "Drug Verification";
-            } else if (pageId === 'hosp') {
-                professionalTitle = "Hospital Directory";
-            } else if (pageId === 'reminders') {
-                professionalTitle = "Medication Tracker";
-            } else if (pageId === 'emergency') {
-                professionalTitle = "Emergency SOS";
-            } else {
-                professionalTitle = "Dashboard"; // Default for the home screen
+            if (window.innerWidth <= 768) {
+                toggleMenu(); // Auto-close menu on mobile after selection
             }
 
-            // 4. Update the big text at the top of the screen
+            let professionalTitle = "";
+            if (pageId === 'appt') professionalTitle = "My Appointments";
+            else if (pageId === 'drug') professionalTitle = "Drug Verification";
+            else if (pageId === 'hosp') professionalTitle = "Hospital Directory";
+            else if (pageId === 'reminders') professionalTitle = "Medication Tracker";
+            else if (pageId === 'emergency') professionalTitle = "Emergency SOS";
+            else professionalTitle = "Dashboard";
+
             document.getElementById('pageTitle').innerText = professionalTitle;
         }
 
-        // Auth Logic
         function goToSignIn() {
             if(!document.getElementById('regName').value) return alert("Fill in your name");
             document.getElementById('signUpOverlay').style.display = 'none';
@@ -229,7 +324,6 @@
             document.getElementById('signInOverlay').style.display = 'none';
         }
 
-        // Booking Logic
         function bookNow() {
             const hosp = document.getElementById('hospSelect').value;
             const hour = parseInt(document.getElementById('apptTime').value);
@@ -238,7 +332,6 @@
 
             if(!date || !phone) return alert("Please pick a date and enter your phone number.");
 
-            // Calculate Reminders (5h, 3h, 1h)
             const calc = (h) => h <= 0 ? (h+12)+" PM (Yesterday)" : (h > 12 ? (h-12)+":00 PM" : h+":00 AM");
             const r5 = calc(hour - 5);
             const r3 = calc(hour - 3);
@@ -246,7 +339,6 @@
 
             alert(`Congratulations! You've successfully booked an appointment.\n\nReminders through SMS will be sent to ${phone} at:\n- ${r5}\n- ${r3}\n- ${r1}`);
 
-            // Update Appointment Page
             document.getElementById('noAppt').style.display = 'none';
             document.getElementById('apptList').innerHTML = `
                 <div class="card" style="border-left: 6px solid var(--primary);">
@@ -255,12 +347,9 @@
                     <p style="color:var(--primary); font-size:0.9rem;">SMS Alerts are active for 5h, 3h, and 1h before your visit.</p>
                 </div>
             `;
-
-            // Automatic Redirect
             showPage('appt');
         }
 
-        // Drug Logic
         function verifyDrug() {
             const pin = document.getElementById('drugPin').value;
             const res = document.getElementById('drugResult');
@@ -271,7 +360,6 @@
             }
         }
 
-        // NEW: Medication Tracker Function
         function addReminder() {
             const name = document.getElementById('drugName').value;
             const time = document.getElementById('drugTime').value;
@@ -290,7 +378,6 @@
             alert("Medication reminder added successfully!");
         }
 
-        // NEW: Emergency SOS Function
         function triggerSOS() {
             document.getElementById('emergencyInfo').style.display = 'block';
             alert("Connecting to Emergency Services... Please stay on the line.");
